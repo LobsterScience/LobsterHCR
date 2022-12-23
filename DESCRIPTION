@@ -1,0 +1,9 @@
+Package: LobsterHCR
+Type: Package
+Title: Lobster population simulator for harvest control rules
+Version: 0.1.0
+Authors@R: c(person('Brad', 'Hubley',email='brad.hubley@dfo-mpo.gc.ca', role='aut'), person('Adam', 'Cook',email='adam.cook@dfo-mpo.gc.ca', role=c('aut','cre')))
+Description: Cohort or population simulation for lobster stocks under either a static or dynamic set of evironmental conditions.
+License: MIT
+Encoding: UTF-8
+LazyData: true
