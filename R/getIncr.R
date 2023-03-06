@@ -1,8 +1,8 @@
 #' @title getIncr
-#' @description Prediction of moulting based on day since last moult, size and can include temperature through a degree day metric
-#' @param \code{p} :parameter list containing (at a minimum) region, doy (day of year), temp (temperature at doy)
-#' @param \code{cl} : carapace width 
-#' @return The predicted probability of moulting
+#' @description Prediction of moult increment based on carapace length and sex
+#' @param \code{p} :parameter list containing carapace length (lens) and sex
+#' @param \code{cl} : carapace width
+#' @return The predicted moult increment
 #' @author  Brad Hubley, \email{Brad.Hubley@@dfo-mpo.gc.ca}
 #' @export
 

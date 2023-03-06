@@ -5,12 +5,18 @@
 #' @export
 
 
-getBerried = function(p){
-	pB =  1 / (1+exp(-0.1*(p$doy-p$gestation)))
+getBerried2 = function(p){
+	if(is.element('gestation',names(p))) {
+	  pB =  1 / (1+exp(-0.1*(p$doy-p$gestation)))
 	pR =  1 / (1+exp(-0.1*(p$doy-(p$gestation+p$brood)))) #proportion released eggs
+	} else {
 
+	  pB =  1 / (1+exp(-0.1*(p$doy-280)))
+	  pR =  1 / (1+exp(-0.1*(p$doy-250)))
 
-	pB = pB * pMat(p, cl=p$lens) #proportion berried at length
+}
+
+	pB = pB * pMat2(p, cl=p$lens, lfa=p$LFA) #proportion berried at length
 
 	return(list(pB=pB,pR=pR))
 }

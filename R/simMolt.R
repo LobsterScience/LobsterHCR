@@ -18,8 +18,11 @@ simMolt = function(p,gdd=T,continuous.recruitment=F){
 	totalRemovals = totalPop
 	totalMolts = totalPop
 	moltProbs = totalPop
+	totalNotch = totalPop
+	totalNotchPostRelease = totalPop
 	totalEggs = array(0,dim=c(p$nt,length(p$lens)))
 	totalPop[1,1,1,1] = p$StartPop # start with
+
 	if(continuous.recruitment) {
 			xxs = round(365/p$timestep)
 			xx = seq(1,p$nt,by=xxs)
@@ -44,28 +47,27 @@ simMolt = function(p,gdd=T,continuous.recruitment=F){
 		# the molting process
 		for(i in 1:I){ # of molts
 
-
 			J = ifelse(t<p$maxTime,t,p$maxTime)
 
 			for(j in 1:J){ # of days since last molt
 
 				p$doy =  j * p$timestep # days since last molt
 				p$ddoy = p$doy
-				
 				if(gdd) p$ddoy =  getDegreeDays	(p,t) #degreedays since last molt
 
-				#d = t * p$timestep
-				#if(gdd) p$ddoy = sum(p$dailytemps[(d-p$doy):d]) 
-
 				if(p$sex==2){
-						#browser()
-						bf = getBerried(p)
+
+						bf = getBerried(p) #deg days not used at present
 						notBerried = totalPop[t,,i,j] * (1 - bf$pB) # Not Berried
 						berried = totalPop[t,,i,j] * (bf$pB) # Berried
-						released = totalBerried[t,,i,j] * bf$pR
+		  			released = totalBerried[t,,i,j] * bf$pR
+						uN = getunNotched(p)
+						releasedAndNotch = totalNotch[t,,i,j] * uN
+						released = released - releasedAndNotch
+						if(t==8 & i==3 & j==2) browser()
 						totalBerried[t+1,,i,j+1] = totalBerried[t,,i,j] + berried - released #add to totalBerried
 						totalPop[t,,i,j] = notBerried + released # Return berried that release eggs to total Pop
-						spawners = spawners + released 
+						spawners = spawners + released
 
 				}
 				gm = getGroMat(p)
@@ -74,20 +76,22 @@ simMolt = function(p,gdd=T,continuous.recruitment=F){
 				totalPop[t+1,,i+1,1] = totalPop[t+1,,i+1,1] + molted # combine newly molted into 1 timestep since last molt slot
 				totalMolts[t,,i,j] = molted
 				moltProbs[t,,i,j] = gm$pM
-
-				
 			}
 		}
-
 		# mortality
 
 		for(l in 1:length(p$lens)){
 
 			totalRemovals[t+1,l,,] = totalPop[t+1,l,,]  * ((p$Fl[l] * Fty[t]) / (p$Fl[l] * Fty[t] + p$Ml[l]* ty)) * (1 - exp(-(p$Fl[l] * Fty[t] + p$Ml[l] * ty))) #Baranov
+
 			safe = totalPop[t+1,l,,] * p$reserve * exp(-p$Ml[l] * ty)
 			totalPop[t+1,l,,] = totalPop[t+1,l,,] * (1 - p$reserve)
 			totalPop[t+1,l,,] = totalPop[t+1,l,,] * exp(-p$Ml[l] * ty) * exp(-p$Fl[l] * Fty[t]) + safe
-			if(p$sex==2)totalBerried[t+1,l,,] = totalBerried[t+1,l,,] * exp(-p$Ml[l] * ty) 
+			if(p$sex==2){
+			  totalBerried[t+1,l,,] = totalBerried[t+1,l,,] * exp(-p$Ml[l] * ty)
+			  totalNotch[t+1,l,,] = totalBerried[t+1,l,,]  * ((p$Fl[l] * Fty[t]) / (p$Fl[l] * Fty[t] + p$Ml[l]* ty)) * (1 - exp(-(p$Fl[l] * Fty[t] + p$Ml[l] * ty))) # catch of berried, all berried get notched
+
+			}
 		}
 
 		if(p$sex==2)totalEggs[t+1,] = spawners * Fecundity(cl = p$lens)
@@ -105,9 +109,11 @@ simMolt = function(p,gdd=T,continuous.recruitment=F){
 	names(totalRemovals)=paste0("CL",p$lens)
 	totalMolts = data.frame(apply(totalMolts,c(1,2),sum))
 	names(totalMolts)=paste0("CL",p$lens)
+	totalNotch = data.frame(apply(totalNotch,c(1,2),sum))
+	names(totalNotch)=paste0("CL",p$lens)
 
 	print(Sys.time()-start)
-	
-	return(list(finalPop=finalPop,finalBerried=finalBerried,totalPop=totalPop,totalBerried=totalBerried,totalEggs=totalEggs,totalRemovals=totalRemovals,totalMolts=totalMolts,moltProbs=moltProbs))
+
+	return(list(finalPop=finalPop,finalBerried=finalBerried,totalPop=totalPop,totalBerried=totalBerried,totalEggs=totalEggs,totalRemovals=totalRemovals,totalMolts=totalMolts,moltProbs=moltProbs,totalNotch = totalNotch))
 }
 

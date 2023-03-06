@@ -15,24 +15,42 @@ load_all('C:/Users/Cooka/Documents/git/LobsterHCR/')
 
 p$current.assessment.year=year(Sys.time())
 
-p$lfas= 27 #c("27", "28", "29", "30", "31.1", "31.2", "32", "33", "34", "35", "36", "37", "38")
+p$LFA= 27 #c("27", "28", "29", "30", "31.1", "31.2", "32", "33", "34", "35", "36", "37", "38")
 
 redoTaggingModels=F
 
-	TempModelling = TempModel(areas = 'subarea',redo=redoTaggingModels)
-	#TempModelPlot(TempModelling,xlim=c(1980,2017),depths=c(5,25,50),Area=c("27N","27S", "29", "30","31A","31B", "32", "33E", "33W"),graphic='R')
-	p$TempModel = TempModelling$Model
+  p$TempModel =TempModel(areas = 'subarea',redo=redoTaggingModels)$Model
+	p$moltModel = moltModel(p,redo.dd=F,redo=redoTaggingModels)
 
-	MoltModelling = moltModel(p,redo.dd=F,redo=redoTaggingModels)
-	p$moltModel = MoltModelling
 
 ####### Base
 	p$F = 1
-	p$Area = p$lfas
-	plist = getSimList(p,sex=2)
+	p$sex=2
+	p$LS=82.5
+	p$Fadj = 1
+	p$Sadj = 1
+	p$Sclose='end'
+	p$nyr = 15					# number of timesteps
+	p$lens = seq(50,200,5)		# carapace length bins (mm)
+	p$timestep = 14  			# in days
+	p$M = 0.1 #or vector of length lens
+	p$reserve = 0.1 # % of lobsters that don't trap
+	p$handlingM = 0.01 #applied to berried only at this point
+	#can specify p$season as p$season = c(as.Date("2000-05-16"),as.Date("2000-07-15")) # 27 or let getLobsterList fill in commercial seasons
+
+	#window
+	p$window=NULL
+	p$notch = NULL
+	p$notch.compliance=1 #everyone is doing it
+	p$notchGrowOut = c(0.1,.3,.6) #retainable vnotch prob post molt, Moult1, moult2, moult3
+	plist = getLobsterList(p)
 	names(plist) = p$lfas
 
-	#run one = simMolt(p)
+	x= simLobster(p)
+  plot(apply(x$finalPop,1,sum),type='h')
+  plot(apply(x$finalBerried,1,sum),type='h')
+  plot(apply(x$totalRemovals,1,sum),type='h')
+
 
 	mlist = mclapply(X = plist, FUN = simMolt, mc.cores=length(p$lfas))
 	names(mlist) = p$lfas

@@ -4,23 +4,22 @@ getSimList = function(p,sex=1, LS=82.5, Fadj = 1, Sadj = 1, Sclose='end', window
 	plist = list()
 
 	for(i in 1:length(p$lfas)){
-	
+
 		p$sex = sex					# run sexes seperately
 		p$LS = LS					# legal size (mm)
-		
+
 		p$Area = p$lfas[i]
-		p$Depth = 15
-	
+
 		p$StartPop = 1000
-		
+
 		p$nt = 60					# number of timesteps
 		p$lens = seq(50,200,5)		# carapace length bins (mm)
 		p$timestep = 91  			# in days
-	
+
 		#reproduction
 		p$gestation = 320
 		p$brood = 360
-	
+
 		#season timing
 		if(p$Area == "27N" || p$Area == "27S" || p$Area == "27")  p$season = c(as.Date("2000-05-16"),as.Date("2000-07-15")) # 27
 		if(p$Area == "29")                                        p$season = c(as.Date("2000-05-01"),as.Date("2000-06-30")) # 29
@@ -35,7 +34,7 @@ getSimList = function(p,sex=1, LS=82.5, Fadj = 1, Sadj = 1, Sclose='end', window
 
 		if(p$Area %in%  c("27N",'27S', "27",'29','30','31A','31B','32','33','34')) p$startDate = as.Date("1999-12-01")
 		if(p$Area %in%  c('35','36','38')) p$startDate = as.Date("1999-10-01")
-		
+
 
 		#season adjustment
 		#browser()
@@ -44,41 +43,44 @@ getSimList = function(p,sex=1, LS=82.5, Fadj = 1, Sadj = 1, Sclose='end', window
 			if(Sclose=='end')p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-Sadj)
 			if(Sclose=='start')p$season[1] = p$season[1] + (p$season[2]-p$season[1])*(1-Sadj)
 		}
-		
+
 		if(length(p$season)==4){
-			if(Sclose=='end'){p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-Sadj);p$season[4] = p$season[4] - (p$season[4]-p$season[3])*(1-Sadj)} 
+			if(Sclose=='end'){p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-Sadj);p$season[4] = p$season[4] - (p$season[4]-p$season[3])*(1-Sadj)}
 			if(Sclose=='start'){p$season[1] = p$season[1] + (p$season[2]-p$season[1])*(1-Sadj); p$season[3] = p$season[3] + (p$season[4]-p$season[3])*(1-Sadj)}
 		}
 
 
 		#mortality
 		p$M = 0.1
-		if(is.null(p$F))p$F = getFccir(p)
+		if(is.null(p$F))p$F = getF(p)
 
 		#window
 		p$window = window
-		
+
 
 		# fishing mortality adjustment
 		p$F = p$F * Fadj
-	
+
 		p$reserve = 0.1 # % of lobsters that don't trap
-	
-		# rough temperature generator (for degree day growth)
-		#coldestday = as.numeric(as.Date("2017-02-23") - as.Date(p$startDate) )
-		#p$dailytemps = rDailyTemps(x=1:(p$nt*p$timestep),b=10,m=10,s=coldestday)
-	
-		# predicted temperature from temp model (for degree day growth)
-		if(p$Area == '31A') p$Area = 311
-		p$dailytemps = TempModelPredict(p)
-		p$Area = '31A'
+
+		if(p$lfas == '31A') p$lfas = 311
+		if(p$lfas == '31B') p$lfas = 312
+
+				#p$dailytemps = TempModelPredict(p)
+
+		p$dailytemps = glorysTempImport(p)
+
+		if(p$lfas == 311) p$lfas = '31A'
+		if(p$lfas == 312) p$lfas = '31B'
+
 		p$mint = 10 # minimum temperature for a lobster to molt
-	
-		#growth 		
+
+		#growth
 	p$Incr = getIncr(p)
-		
+
 		p$maxMolts = 15
 		p$maxTime = 20
+
 
 		plist[[i]] = p
 
