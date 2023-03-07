@@ -17,14 +17,12 @@ p$current.assessment.year=year(Sys.time())
 
 p$LFA= 27 #c("27", "28", "29", "30", "31.1", "31.2", "32", "33", "34", "35", "36", "37", "38")
 
-redoTaggingModels=F
+#p$moltModel = readRDS(file.path(project.datadirectory('bio.lobster'),'analysis','Tagging','moltModel_moltIncre.rds'))
 
-  p$TempModel =TempModel(areas = 'subarea',redo=redoTaggingModels)$Model
-	p$moltModel = moltModel(p,redo.dd=F,redo=redoTaggingModels)
 
 
 ####### Base
-	p$F = 1
+	p$F = 1.2
 	p$sex=2
 	p$LS=82.5
 	p$Fadj = 1
@@ -37,17 +35,20 @@ redoTaggingModels=F
 	p$reserve = 0.1 # % of lobsters that don't trap
 	p$handlingM = 0.01 #applied to berried only at this point
 	#can specify p$season as p$season = c(as.Date("2000-05-16"),as.Date("2000-07-15")) # 27 or let getLobsterList fill in commercial seasons
+	p$startDate = as.Date("1999-10-01")
+	p$moltDate = as.Date("2000-07-14")
+	p$spawnDate = as.Date("2000-08-01")
 
 	#window
 	p$window=NULL
 	p$notch = NULL
-	p$notch.compliance=1 #everyone is doing it
-	p$notchGrowOut = c(0.1,.3,.6) #retainable vnotch prob post molt, Moult1, moult2, moult3
+	p$notch.compliance=1 #everyone is doing it=1 no notch =0
+	p$notchGrowOut = c(0.1,.3,.6) #retainable vnotch prob post molt, Moult1, moult2, moult3 all return to pop
 	plist = getLobsterList(p)
 	names(plist) = p$lfas
 
 	x= simLobster(p)
-  plot(apply(x$finalPop,1,sum),type='h')
+  plot(apply(x$finalPop,1,sum),type='h') #you will see spikes in teh female pop post egg release and molt, then drop off again with berried happening right after
   plot(apply(x$finalBerried,1,sum),type='h')
   plot(apply(x$totalRemovals,1,sum),type='h')
 

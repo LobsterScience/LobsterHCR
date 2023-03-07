@@ -39,8 +39,16 @@ simLobster = function(p,gdd=T){
 
 	for(t in 1:(p$nt-1)){
 	    spawners = 0
-      moltTime = sample(c(18:21),1)
+      if(!exists('moltDate',p)) {
+                moltTime = sample(c(18:21),1)
+              }else{
+                moltTime = round(as.numeric((p$moltDate - p$startDate)/p$timestep))
+                }
+      if(!exists('spawnDate',p)){
       spawnTime = moltTime+1
+      } else{
+        spawnTime = round(as.numeric((p$spawnDate - p$startDate)/p$timestep))
+        }
 			p$doy =  interval[t] * p$timestep # days since last molt
 			p$ddoy = p$doy
 
@@ -61,7 +69,7 @@ simLobster = function(p,gdd=T){
 				    notchedM1[l] = notchedM1[l] * exp(-p$Ml[l] * ty)
 				    notchedM2[l] = notchedM2[l] * exp(-p$Ml[l] * ty)
 				    totalNewNotch[t+1,l] =  totalBerried[t+1,l]  * ((p$Fl[l] * Fty[t]) / (p$Fl[l] * Fty[t] + p$Ml[l]* ty + p$handlingM)) * (1 - exp(-(p$Fl[l] * Fty[t] + p$Ml[l] * ty+ p$handlingM))) *p$notch.compliance # catch of berried, all berried get notched
-				    totalNotch[t,l] = totalNewNotch[t+1,l] + notchedM1[l] + notchedM2[l]
+				    totalNotch[t+1,l] = totalNewNotch[t+1,l] + notchedM1[l] + notchedM2[l]
 				    }
 				}
 
@@ -72,7 +80,6 @@ simLobster = function(p,gdd=T){
 				noMolt = totalPop[t+1,] * (1 - gm$pMolt) #NoMolt
 				molted = (totalPop[t+1,] * gm$pMolt) %*% gm$transMatrix #Molt
 				totalPop[t+1,] = noMolt + molted # combine newly molted into 1 timestep since last molt slot
-
 				if(p$sex==2){
 				  released = totalBerried[t+1,] - totalNewNotch[t+1,]
 				  released = released %*% gm$transMatrix #all berried releasing eggs molt
@@ -83,15 +90,12 @@ simLobster = function(p,gdd=T){
 				  notchedM2 = notchedM2* (gm$pMolt) #moulting
           notchedM3 = notchedM2  %*% gm$transMatrix #after 3 moults all return to pop
 				  totalPop[t+1,] = totalPop[t+1,] + notchedM3
-
 				  notchedM1nm = notchedM1* (1 - gm$pMolt)
 				  notchedM1 = notchedM1* ( gm$pMolt)
 				  notchedM2 = notchedM1 %*% gm$transMatrix
 				  notchedM2go = notchedM2 *(p$notchGrowOut[2])
 				  notchedM2 = notchedM2 * (1-p$notchGrowOut[2]) + notchedM2nm
-
 				  totalPop[t+1,] = totalPop[t+1,] + notchedM2go
-
 				  notchedAndReleased = totalNewNotch[t+1,]
 				  notchedM1 = notchedAndReleased %*% gm$transMatrix + notchedM1nm #Molt
 				  notchedM1go = notchedM1 *(p$notchGrowOut[1])

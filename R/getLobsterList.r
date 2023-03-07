@@ -19,7 +19,6 @@ getLobsterList = function(p){
 		if(p$LFA == "38")                                        p$season = c(as.Date("1999-11-12"),as.Date("2000-06-25")) # 38
   }
 
-	  p$startDate = as.Date("1999-10-01")
 
 
 		#season adjustment
