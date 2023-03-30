@@ -1,5 +1,5 @@
 #' @export
-getFvec = function(f, LS, lens, window=NULL){
+getFvec = function(f, LS, lens, window=NULL, max=NULL){
 
 	fl=rep(0,length(lens))
 	by = diff(lens)[1]
@@ -9,7 +9,12 @@ getFvec = function(f, LS, lens, window=NULL){
 	#nf = -log(1 - p * (1-exp(-f)))
 	fl[i] = f * p
 	fl[(i+1):length(lens)] = f
-	
+
+	if(!is.null(max)) {
+	      i = which.min(abs(lens-max))
+    fl[i:length(fl)] <- 0
+	}
+
 	if(!is.null(window)){
 		w = ceiling(window/by)
 		j = w - lens[1]/by

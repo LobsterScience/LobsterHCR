@@ -26,22 +26,22 @@ getLobsterList = function(p){
 		p$season = as.Date(p$season)
 
 		if(length(p$season)==2){
-			if(Sclose=='end')p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-Sadj)
-			if(Sclose=='start')p$season[1] = p$season[1] + (p$season[2]-p$season[1])*(1-Sadj)
+			if(p$Sclose=='end')p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-p$Sadj)
+			if(p$Sclose=='start')p$season[1] = p$season[1] + (p$season[2]-p$season[1])*(1-p$Sadj)
 		}
 
 		if(length(p$season)==4){
-			if(Sclose=='end'){p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-Sadj);p$season[4] = p$season[4] - (p$season[4]-p$season[3])*(1-Sadj)}
-			if(Sclose=='start'){p$season[1] = p$season[1] + (p$season[2]-p$season[1])*(1-Sadj); p$season[3] = p$season[3] + (p$season[4]-p$season[3])*(1-Sadj)}
+			if(p$Sclose=='end'){p$season[2] = p$season[2] - (p$season[2]-p$season[1])*(1-Sadj);p$season[4] = p$season[4] - (p$season[4]-p$season[3])*(1-p$Sadj)}
+			if(p$Sclose=='start'){p$season[1] = p$season[1] + (p$season[2]-p$season[1])*(1-Sadj); p$season[3] = p$season[3] + (p$season[4]-p$season[3])*(1-p$Sadj)}
 		}
 
 
 		#mortality
 
-		if(is.null(p$F))p$F = getF(p)
+		p$F = getF(p,exploitation_rate = p$exploitation_rate,ccir=F) #adjust F to season length
 
 		# fishing mortality adjustment
-		p$F = p$F * Fadj
+		p$F = p$F * p$Fadj
 
 
 		if(p$LFA == '31A') p$LFA = 311
@@ -59,5 +59,5 @@ getLobsterList = function(p){
 		#growth increment
   	p$Incr = getIncr(p)
 
-	return(plist)
+	return(p)
 }

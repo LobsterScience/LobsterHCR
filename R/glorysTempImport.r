@@ -4,9 +4,9 @@ glorysTempImport <- function(p=p, file=file.path(project.datadirectory('bio.lobs
 
   re = readRDS(file)
   re$geometry <- NULL
-  if(p$lfas=='31A')
-  re = subset(re, LFA == p$lfas)
-  if(p$lfas %in% c(27,29,30,311,312,32)) re = subset(re, z>2 & z<30)
+  if(p$LFA=='31A')
+  re = subset(re, LFA == p$LFA)
+  if(p$LFA %in% c(27,29,30,311,312,32)) re = subset(re, z>2 & z<30)
   re = as_tibble(re)
   rea = re %>% group_by(doy) %>% summarize(across(starts_with('BT'),mean, .names = "{.col}")) %>% tidyr::pivot_longer(cols=starts_with('BT'),values_to='temp')
   rea$yr = as.numeric(substr(rea$name,4,7)  )

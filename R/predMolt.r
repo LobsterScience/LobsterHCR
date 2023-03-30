@@ -3,10 +3,6 @@
 #' @param \code{p} :parameter list containing (at a minimum) area, doy (day of year), temp (temperature at doy)
 #' @param \code{cl} : carapace width
 #' @return The predicted probability of moulting
-#' @examples
-#' require(devtools)
-#' load_all('E:/git/LobsterScience/bio.lobster') #to load from directory rather than package if modifying
-#' nefsc.db(DS = 'odbc.dump.redo')
 #' @author  Adam Cook, \email{Adam.Cook@@dfo-mpo.gc.ca}
 #' @export
 
